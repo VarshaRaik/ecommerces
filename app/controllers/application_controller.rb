@@ -9,6 +9,20 @@ class ApplicationController < ActionController::Base
     root_path
   end
 
+  def authenticate_active_admin_user!
+    # Ensure user logged in
+    unless user_signed_in?
+      redirect_to new_user_session_path, alert: "Please login as admin"
+      return
+    end
+
+    # Ensure role exists and is admin
+    unless current_user.role&.role_name == 'admin'
+      # optional: sign_out current user if you want
+      redirect_to root_path, alert: "You are not authorized to access admin panel"
+    end
+  end
+
   protected
 
   def configure_permitted_parameters
